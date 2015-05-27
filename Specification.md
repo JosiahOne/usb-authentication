@@ -11,3 +11,40 @@ What's the alternative? Well, turns out that is quite difficult. Biometrics, whi
 USBAuth attempts to solve these problems by providing a cheap, simplistic, and thorough security solution, similar to what Google is attempting. The gist of the solution is that each user will have a USB drive loaded with specific, encrypted user name and password data (which they don't need to know). When plugged in to a machine, the library will read the user name and password from the drive and prompt for a PIN. If they match, we log in with the user name and password provide. Optionally, you can randomly require a fingerprint scan to verify that the PIN and USB holder actually IS the person who is on the drive.
 
 ## USB File System Spec ##
+
+### Error-Preventation Notice ###
+
+The USB File system requires data to be EXACT, if anything is wrong, we wipe the stick. Wiping the stick will of course make that stick unusable for login.
+
+### Files ###
+
+#### username.aid ####
+A file that contains ONLY an encrypted/disgused version of the user's user name.
+
+#### password.aid ####
+A file that contains ONLY an encrypted/disgused version of the user's password.
+
+#### pin.aid ####
+The pin that we compare with.
+
+#### biodata.aid ####
+A file containing the biometric data which will be compared with at random times. This data should be synced FROM some database that all your applications will use. More on that later.
+
+### Location of drive ###
+There should be NO other USB drives plugged into the client machine. On Windows, the F: drive should be used by the USB stick, nothing else.
+
+## App-side process (AKA, what the Library does) ##
+
+1. Read PIN from client App-side
+2. Prompt for USB drive.
+3. Compare PINs.
+4. (If Match, continue, else, fail).
+5. Send back username/password
+6. If the BIO flag is set, then randomly pick a number from 0 - BIONUM. If number == BIONUM, prompt for a fingerprint scan.
+7. If match, log in, else fail. Mark that we MUST have a fingerprint for next scan.
+
+## Encryption Spec ##
+
+## BIO Spec ##
+
+ 
