@@ -45,6 +45,25 @@ There should be NO other USB drives plugged into the client machine. On Windows,
 
 ## Encryption Spec ##
 
+All files on the USB drive are stored using the same (generally basic) encryption scheme. The encryption algorithm uses a key to encrypt all strings, this key is your "application encryption key" and is used to give each company a unique encryption algorithm. This way users at home can not decrypt their own files without it.
+
+Remember, each USB drive can only have ONE key holder at a time. So you could not use the same key for both personal and private applications. This is on purpose.
+
 ## BIO Spec ##
 
- 
+The BIO process requires three things. A BIO-Database, which is where you will store the "main" bio data, and can only be added to, not deleted. When a new user sets up a USB key drive, their bio data is first added to the database.
+
+You then Load their BIO to their flash drive, and load the BIO data to the client machine.
+
+### Log in Process ###
+
+                              User Logs in
+                                   |
+                                   V
+    Compare the USB BIO Data with the BIO data stored on the client machine
+                                   |
+                                   V
+     If Match, compare fingerprint scan to the data on the client machine.
+                                   |
+                                   V
+          Occasionally sync machine BIO data with database BIO data.
