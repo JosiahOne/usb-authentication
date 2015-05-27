@@ -8,6 +8,10 @@ USBAuth::~USBAuth() {
 
 }
 
+void USBAuth::SetKey(string key) {
+  _key = key;
+}
+
 void USBAuth::ReadPin(int pin) {
   _pin = pin;
 }
@@ -35,15 +39,42 @@ string USBAuth::_LocateUSB() {
    *   Linux: /media/IDENTCARD/
    *   OS X: /media/IDENTCARD/ ?
    */
-   vector<char*> locations = {"F:\\\\", "F://", "/cygdrive/f/", "/media/IDENTCARD/"};
+   vector<string> locations(4);
+   locations = {"F:\\\\", "F://", "/cygdrive/f/", "/media/IDENTCARD/"};
    tinydir_dir dir;
 
-   for (int i = 0; i < locations.length(); i++) {
-     tinydir_open(&dir, locations[i]);
+   for (int i = 0; i < locations.size(); i++) {
+     tinydir_open(&dir, locations[i].c_str());
      if (dir.has_next) {
-       return string(locations[i]);
+       return locations[i];
      }
    }
 
    return "ERROR";
+}
+
+string USBAuth::_GetUsername() {
+  string returnData = "";
+  tinydir_dir dir;
+  tinydir_open(&dir, _LocateUSB().c_str());
+  while (dir.has_next) {
+    tinydir_file file;
+    tinydir_readfile(&dir, &file);
+    if (string(file.name) == "username.aid") {
+      std::ifstream ifs(file.path);
+      std::string content( (std::istreambuf_iterator<char>(ifs) ),
+                         (std::istreambuf_iterator<char>()    ) );
+
+      returnData = content;
+    }
+
+    tinydir_next(&dir);
+  }
+  return returnData;
+}
+string USBAuth::_GetPassword() {
+  return "";
+}
+int USBAuth::_GetPin() {
+  return 0;
 }
