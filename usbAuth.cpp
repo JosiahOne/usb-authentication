@@ -22,8 +22,8 @@ identReturn USBAuth::Authenticate() {
   if (_GetPin() == _pin) {
     // Decide if we need to verify with a fingerprint
     // TODO: Just assume we don't for now.
-    identity.username = _GetUsername();
-    identity.password = _GetPassword();
+    identity.username = _DecryptString(_GetUsername());
+    identity.password = _DecryptString(_GetPassword());
     identity.failed = false;
   } else {
     identity.failed = true;
@@ -62,7 +62,7 @@ string USBAuth::_GetPassword() {
 }
 
 int USBAuth::_GetPin() {
-  return _GetFile("pin.aid");
+  return strtol(_DecryptString(_GetFile("pin.aid")).c_str(), NULL, 10);
 }
 
 string USBAuth::_GetFile(string name) {
@@ -74,13 +74,39 @@ string USBAuth::_GetFile(string name) {
     tinydir_readfile(&dir, &file);
     if (string(file.name) == name) {
       std::ifstream ifs(file.path);
-      std::string content( (std::istreambuf_iterator<char>(ifs) ),
-                         (std::istreambuf_iterator<char>()    ) );
+      std::string stringContent = "";
+      getline(ifs, stringContent);
 
-      returnData = content;
+      returnData = stringContent;
     }
 
     tinydir_next(&dir);
   }
   return returnData;
+}
+
+string USBAuth::_DecryptString(string someString) {
+  return _DoXORCipher(someString);
+}
+
+string USBAuth::_EncryptString(string someString) {
+  return _DoXORCipher(someString);
+}
+
+string USBAuth::_DoXORCipher(string someString) {
+  string longKey = _key;
+  while (longKey.length() < someString.length()) {
+    longKey += _key;
+  }
+
+  for (int i = 0; i < someString.size(); i++) {
+    someString[i] ^= longKey[i];
+  }
+
+  cout << someString;
+  std::ofstream out("pin.aid");
+      out << someString;
+      out.close();
+  return someString;
+
 }

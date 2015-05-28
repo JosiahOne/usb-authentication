@@ -4,6 +4,7 @@
 #include <fstream>
 #include "tinydir.h"
 #include <vector>
+#include <sstream>
 
 using namespace std;
 
@@ -30,7 +31,8 @@ private:
   string _GetPassword();
   string _GetUsername();
   int _GetPin();
-  string _DecryptUsername();
-  string _DecryptPassword();
+  string _DecryptString(string someString);
+  string _EncryptString(string someString);
+  string _DoXORCipher(string someString);
   string _GetFile(string name);
 };
