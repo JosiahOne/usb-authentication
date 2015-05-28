@@ -1,4 +1,5 @@
 #include "usbAuth.h"
+#include "jcpp-helper/jstring.h"
 
 USBAuth::USBAuth() {
 
@@ -22,7 +23,8 @@ identReturn USBAuth::Authenticate() {
   if (_GetPin() == _pin) {
     // Decide if we need to verify with a fingerprint
     // TODO: Just assume we don't for now.
-    identity.username = _DecryptString(_GetUsername());
+    cout << "PIN MATCH";
+    identity.username = _DecryptString(_ConvertToStringForm(_GetUsername()));
     identity.password = _DecryptString(_GetPassword());
     identity.failed = false;
   } else {
@@ -62,7 +64,7 @@ string USBAuth::_GetPassword() {
 }
 
 int USBAuth::_GetPin() {
-  return strtol(_DecryptString(_GetFile("pin.aid")).c_str(), NULL, 10);
+  return strtol(_DecryptString(_ConvertToStringForm(_GetFile("pin.aid"))).c_str(), NULL, 10);
 }
 
 string USBAuth::_GetFile(string name) {
@@ -85,15 +87,29 @@ string USBAuth::_GetFile(string name) {
   return returnData;
 }
 
-string USBAuth::_DecryptString(string someString) {
-  return _DoXORCipher(someString);
+string USBAuth::_ConvertToByteForm(string someString) {
+  string returnString = " ";
+  for (int i = 0; i < someString.size(); i++) {
+    ostringstream oss;
+    oss << returnString << static_cast<int>(static_cast<unsigned char>(someString[i])) << " ";
+    returnString = oss.str();
+  }
+
+  return returnString;
 }
 
-string USBAuth::_EncryptString(string someString) {
-  string encryptedString = _DoXORCipher(someString);
-  string byteForm = _ConvertToByteForm(encryptedString);
-  cout << byteForm;
-  return byteForm;
+string USBAuth::_ConvertToStringForm(string byteFormString) {
+  string returnString = "";
+
+  vector<string> stringArray = JCPP::GetStringsBetweenStrings(byteFormString, " ", " ");
+  vector<int> intArray;
+  for (int i = 0; i < stringArray.size(); i++) {
+    intArray.push_back(strtol(stringArray[i].c_str(), NULL, 10));
+    char aChar = intArray[i];
+    returnString += aChar;
+  }
+
+  return returnString;
 }
 
 string USBAuth::_DoXORCipher(string someString) {
@@ -109,12 +125,13 @@ string USBAuth::_DoXORCipher(string someString) {
   return someString;
 }
 
-string USBAuth::_ConvertToByteForm(string someString) {
-  string returnString = " ";
-  for (int i = 0; i < someString.size(); i++) {
-    returnString += static_cast<int>(static_cast<unsigned char>(msg[i]));
-    returnString += " ";
-  }
+string USBAuth::_DecryptString(string someString) {
+  return _DoXORCipher(someString);
+}
 
-  returnString;
+string USBAuth::_EncryptString(string someString) {
+  string encryptedString = _DoXORCipher(someString);
+  string byteForm = _ConvertToByteForm(encryptedString);
+  cout << byteForm;
+  return byteForm;
 }

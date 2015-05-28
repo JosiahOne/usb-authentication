@@ -36,4 +36,5 @@ private:
   string _DoXORCipher(string someString);
   string _GetFile(string name);
   string _ConvertToByteForm(string someString);
+  string _ConvertToStringForm(string byteFormString);
 };
