@@ -25,7 +25,7 @@ identReturn USBAuth::Authenticate() {
     // TODO: Just assume we don't for now.
     cout << "PIN MATCH";
     identity.username = _DecryptString(_ConvertToStringForm(_GetUsername()));
-    identity.password = _DecryptString(_GetPassword());
+    identity.password = _DecryptString(_ConvertToStringForm(_GetPassword()));
     identity.failed = false;
   } else {
     identity.failed = true;
