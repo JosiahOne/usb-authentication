@@ -54,13 +54,25 @@ string USBAuth::_LocateUSB() {
 }
 
 string USBAuth::_GetUsername() {
+  return _GetFile("username.aid");
+}
+
+string USBAuth::_GetPassword() {
+  return _GetFile("password.aid");
+}
+
+int USBAuth::_GetPin() {
+  return _GetFile("pin.aid");
+}
+
+string USBAuth::_GetFile(string name) {
   string returnData = "";
   tinydir_dir dir;
   tinydir_open(&dir, _LocateUSB().c_str());
   while (dir.has_next) {
     tinydir_file file;
     tinydir_readfile(&dir, &file);
-    if (string(file.name) == "username.aid") {
+    if (string(file.name) == name) {
       std::ifstream ifs(file.path);
       std::string content( (std::istreambuf_iterator<char>(ifs) ),
                          (std::istreambuf_iterator<char>()    ) );
@@ -71,10 +83,4 @@ string USBAuth::_GetUsername() {
     tinydir_next(&dir);
   }
   return returnData;
-}
-string USBAuth::_GetPassword() {
-  return "";
-}
-int USBAuth::_GetPin() {
-  return 0;
 }

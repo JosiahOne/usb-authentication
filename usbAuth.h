@@ -20,7 +20,6 @@ public:
   void ReadPin(int pin);
   void SetKey(string key);
   identReturn Authenticate();
-  string _GetUsername();
 
 private:
   int _pin;
@@ -29,7 +28,9 @@ private:
   string _LocateUSB();
   bool _ComparePINs();
   string _GetPassword();
+  string _GetUsername();
   int _GetPin();
   string _DecryptUsername();
   string _DecryptPassword();
+  string _GetFile(string name);
 };
