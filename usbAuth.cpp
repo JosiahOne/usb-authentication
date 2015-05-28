@@ -90,7 +90,10 @@ string USBAuth::_DecryptString(string someString) {
 }
 
 string USBAuth::_EncryptString(string someString) {
-  return _DoXORCipher(someString);
+  string encryptedString = _DoXORCipher(someString);
+  string byteForm = _ConvertToByteForm(encryptedString);
+  cout << byteForm;
+  return byteForm;
 }
 
 string USBAuth::_DoXORCipher(string someString) {
@@ -103,10 +106,15 @@ string USBAuth::_DoXORCipher(string someString) {
     someString[i] ^= longKey[i];
   }
 
-  cout << someString;
-  std::ofstream out("pin.aid");
-      out << someString;
-      out.close();
   return someString;
+}
 
+string USBAuth::_ConvertToByteForm(string someString) {
+  string returnString = " ";
+  for (int i = 0; i < someString.size(); i++) {
+    returnString += static_cast<int>(static_cast<unsigned char>(msg[i]));
+    returnString += " ";
+  }
+
+  returnString;
 }

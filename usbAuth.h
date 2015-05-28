@@ -35,4 +35,5 @@ private:
   string _EncryptString(string someString);
   string _DoXORCipher(string someString);
   string _GetFile(string name);
+  string _ConvertToByteForm(string someString);
 };

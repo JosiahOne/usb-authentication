@@ -7,7 +7,7 @@ int main() {
   USBAuth *auth = new USBAuth;
   auth->SetKey("lathrupencryption");
   auth->ReadPin(1234);
-   auth->Authenticate().username;
+  cout << auth->Authenticate().username;
 
   delete auth;
   return 0;
