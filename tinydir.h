@@ -31,9 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#ifdef _MSC_VER
+#include <tchar.h>
 #pragma warning (disable : 4996)
-#endif
 #else
 #include <dirent.h>
 #include <libgen.h>
@@ -42,6 +41,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /* types */
+
+/* Windows UNICODE wide character support */
+#ifdef _UNICODE
+#define _tinydir_char_t TCHAR
+#define TINYDIR_STRING(s) TEXT(s)
+#define _tinydir_strlen _tcslen
+#define _tinydir_strcpy _tcscpy
+#define _tinydir_strcat _tcscat
+#define _tinydir_strcmp _tcscmp
+#define _tinydir_strrchr _tcsrchr
+#define _tinydir_strncmp _tcsncmp
+#else
+#define _tinydir_char_t char
+#define TINYDIR_STRING(s) s
+#define _tinydir_strlen strlen
+#define _tinydir_strcpy strcpy
+#define _tinydir_strcat strcat
+#define _tinydir_strcmp strcmp
+#define _tinydir_strrchr strrchr
+#define _tinydir_strncmp strncmp
+#endif
 
 #define _TINYDIR_PATH_MAX 4096
 #ifdef _WIN32
@@ -52,29 +72,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 #define _TINYDIR_FILENAME_MAX 256
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 #define _TINYDIR_FUNC static __inline
 #else
 #define _TINYDIR_FUNC static __inline__
 #endif
 
-/* Allow user to use a custom allocator by defining _TINYDIR_MALLOC and _TINYDIR_FREE. */
-#if    defined(_TINYDIR_MALLOC) &&  defined(_TINYDIR_FREE)
-#elif !defined(_TINYDIR_MALLOC) && !defined(_TINYDIR_FREE)
-#else
-#error "Either define both alloc and free or none of them!"
-#endif
-
-#if !defined(_TINYDIR_MALLOC)
-	#define _TINYDIR_MALLOC(_size) malloc(_size)
-	#define _TINYDIR_FREE(_ptr)    free(_ptr)
-#endif //!defined(_TINYDIR_MALLOC)
-
 typedef struct
 {
-	char path[_TINYDIR_PATH_MAX];
-	char name[_TINYDIR_FILENAME_MAX];
-	char *extension;
+	_tinydir_char_t path[_TINYDIR_PATH_MAX];
+	_tinydir_char_t name[_TINYDIR_FILENAME_MAX];
+	_tinydir_char_t *extension;
 	int is_dir;
 	int is_reg;
 
@@ -86,7 +94,7 @@ typedef struct
 
 typedef struct
 {
-	char path[_TINYDIR_PATH_MAX];
+	_tinydir_char_t path[_TINYDIR_PATH_MAX];
 	int has_next;
 	size_t n_files;
 
@@ -104,9 +112,9 @@ typedef struct
 /* declarations */
 
 _TINYDIR_FUNC
-int tinydir_open(tinydir_dir *dir, const char *path);
+int tinydir_open(tinydir_dir *dir, const _tinydir_char_t *path);
 _TINYDIR_FUNC
-int tinydir_open_sorted(tinydir_dir *dir, const char *path);
+int tinydir_open_sorted(tinydir_dir *dir, const _tinydir_char_t *path);
 _TINYDIR_FUNC
 void tinydir_close(tinydir_dir *dir);
 
@@ -128,14 +136,14 @@ int _tinydir_file_cmp(const void *a, const void *b);
 /* definitions*/
 
 _TINYDIR_FUNC
-int tinydir_open(tinydir_dir *dir, const char *path)
+int tinydir_open(tinydir_dir *dir, const _tinydir_char_t *path)
 {
-	if (dir == NULL || path == NULL || strlen(path) == 0)
+	if (dir == NULL || path == NULL || _tinydir_strlen(path) == 0)
 	{
 		errno = EINVAL;
 		return -1;
 	}
-	if (strlen(path) + _TINYDIR_PATH_EXTRA >= _TINYDIR_PATH_MAX)
+	if (_tinydir_strlen(path) + _TINYDIR_PATH_EXTRA >= _TINYDIR_PATH_MAX)
 	{
 		errno = ENAMETOOLONG;
 		return -1;
@@ -150,11 +158,11 @@ int tinydir_open(tinydir_dir *dir, const char *path)
 #endif
 	tinydir_close(dir);
 
-	strcpy(dir->path, path);
+	_tinydir_strcpy(dir->path, path);
 #ifdef _WIN32
-	strcat(dir->path, "\\*");
+	_tinydir_strcat(dir->path, TINYDIR_STRING("\\*"));
 	dir->_h = FindFirstFile(dir->path, &dir->_f);
-	dir->path[strlen(dir->path) - 2] = '\0';
+	dir->path[_tinydir_strlen(dir->path) - 2] = '\0';
 	if (dir->_h == INVALID_HANDLE_VALUE)
 #else
 	dir->_d = opendir(path);
@@ -183,7 +191,7 @@ bail:
 }
 
 _TINYDIR_FUNC
-int tinydir_open_sorted(tinydir_dir *dir, const char *path)
+int tinydir_open_sorted(tinydir_dir *dir, const _tinydir_char_t *path)
 {
 	/* Count the number of files first, to pre-allocate the files array */
 	size_t n_files = 0;
@@ -207,7 +215,7 @@ int tinydir_open_sorted(tinydir_dir *dir, const char *path)
 	}
 
 	dir->n_files = 0;
-	dir->_files = (tinydir_file *)_TINYDIR_MALLOC(sizeof *dir->_files * n_files);
+	dir->_files = (tinydir_file *)malloc(sizeof *dir->_files * n_files);
 	if (dir->_files == NULL)
 	{
 		errno = ENOMEM;
@@ -259,7 +267,7 @@ void tinydir_close(tinydir_dir *dir)
 	dir->n_files = 0;
 	if (dir->_files != NULL)
 	{
-		_TINYDIR_FREE(dir->_files);
+		free(dir->_files);
 	}
 	dir->_files = NULL;
 #ifdef _WIN32
@@ -331,8 +339,8 @@ int tinydir_readfile(const tinydir_dir *dir, tinydir_file *file)
 		errno = ENOENT;
 		return -1;
 	}
-	if (strlen(dir->path) +
-		strlen(
+	if (_tinydir_strlen(dir->path) +
+		_tinydir_strlen(
 #ifdef _WIN32
 			dir->_f.cFileName
 #else
@@ -345,7 +353,7 @@ int tinydir_readfile(const tinydir_dir *dir, tinydir_file *file)
 		errno = ENAMETOOLONG;
 		return -1;
 	}
-	if (strlen(
+	if (_tinydir_strlen(
 #ifdef _WIN32
 			dir->_f.cFileName
 #else
@@ -357,16 +365,16 @@ int tinydir_readfile(const tinydir_dir *dir, tinydir_file *file)
 		return -1;
 	}
 
-	strcpy(file->path, dir->path);
-	strcat(file->path, "/");
-	strcpy(file->name,
+	_tinydir_strcpy(file->path, dir->path);
+	_tinydir_strcat(file->path, TINYDIR_STRING("/"));
+	_tinydir_strcpy(file->name,
 #ifdef _WIN32
 		dir->_f.cFileName
 #else
 		dir->_e->d_name
 #endif
 	);
-	strcat(file->path, file->name);
+	_tinydir_strcat(file->path, file->name);
 #ifndef _WIN32
 	if (stat(file->path, &file->_s) == -1)
 	{
@@ -426,7 +434,7 @@ int tinydir_readfile_n(const tinydir_dir *dir, tinydir_file *file, size_t i)
 _TINYDIR_FUNC
 int tinydir_open_subdir_n(tinydir_dir *dir, size_t i)
 {
-	char path[_TINYDIR_PATH_MAX];
+	_tinydir_char_t path[_TINYDIR_PATH_MAX];
 	if (dir == NULL)
 	{
 		errno = EINVAL;
@@ -438,7 +446,7 @@ int tinydir_open_subdir_n(tinydir_dir *dir, size_t i)
 		return -1;
 	}
 
-	strcpy(path, dir->_files[i].path);
+	_tinydir_strcpy(path, dir->_files[i].path);
 	tinydir_close(dir);
 	if (tinydir_open_sorted(dir, path) == -1)
 	{
@@ -450,26 +458,26 @@ int tinydir_open_subdir_n(tinydir_dir *dir, size_t i)
 
 /* Open a single file given its path */
 _TINYDIR_FUNC
-int tinydir_file_open(tinydir_file *file, const char *path)
+int tinydir_file_open(tinydir_file *file, const _tinydir_char_t *path)
 {
 	tinydir_dir dir;
 	int result = 0;
 	int found = 0;
-	char dir_name_buf[_TINYDIR_PATH_MAX];
-	char file_name_buf[_TINYDIR_FILENAME_MAX];
-	char *dir_name;
-	char *base_name;
+	_tinydir_char_t dir_name_buf[_TINYDIR_PATH_MAX];
+	_tinydir_char_t file_name_buf[_TINYDIR_FILENAME_MAX];
+	_tinydir_char_t *dir_name;
+	_tinydir_char_t *base_name;
 #ifdef _WIN32
-	char drive_buf[_TINYDIR_PATH_MAX];
-	char ext_buf[_TINYDIR_FILENAME_MAX];
+	_tinydir_char_t drive_buf[_TINYDIR_PATH_MAX];
+	_tinydir_char_t ext_buf[_TINYDIR_FILENAME_MAX];
 #endif
 	
-	if (file == NULL || path == NULL || strlen(path) == 0)
+	if (file == NULL || path == NULL || _tinydir_strlen(path) == 0)
 	{
 		errno = EINVAL;
 		return -1;
 	}
-	if (strlen(path) + _TINYDIR_PATH_EXTRA >= _TINYDIR_PATH_MAX)
+	if (_tinydir_strlen(path) + _TINYDIR_PATH_EXTRA >= _TINYDIR_PATH_MAX)
 	{
 		errno = ENAMETOOLONG;
 		return -1;
@@ -477,7 +485,11 @@ int tinydir_file_open(tinydir_file *file, const char *path)
 
 	/* Get the parent path */
 #ifdef _WIN32
+#ifdef _UNICODE
+	if (_wsplitpath_s(
+#else
 	if (_splitpath_s(
+#endif
 			path,
 			drive_buf, sizeof drive_buf,
 			dir_name_buf, sizeof dir_name_buf,
@@ -488,15 +500,15 @@ int tinydir_file_open(tinydir_file *file, const char *path)
 		return -1;
 	}
 	/* Concatenate the drive letter and dir name to form full dir name */
-	strcat(drive_buf, dir_name_buf);
+	_tinydir_strcat(drive_buf, dir_name_buf);
 	dir_name = drive_buf;
 	/* Concatenate the file name and extension to form base name */
-	strcat(file_name_buf, ext_buf);
+	_tinydir_strcat(file_name_buf, ext_buf);
 	base_name = file_name_buf;
 #else
-	strcpy(dir_name_buf, path);
+	_tinydir_strcpy(dir_name_buf, path);
 	dir_name = dirname(dir_name_buf);
-	strcpy(file_name_buf, path);
+	_tinydir_strcpy(file_name_buf, path);
 	base_name = basename(file_name_buf);
 #endif
 	
@@ -514,7 +526,7 @@ int tinydir_file_open(tinydir_file *file, const char *path)
 			result = -1;
 			goto bail;
 		}
-		if (strcmp(file->name, base_name) == 0)
+		if (_tinydir_strcmp(file->name, base_name) == 0)
 		{
 			/* File found */
 			found = 1;
@@ -536,10 +548,10 @@ bail:
 _TINYDIR_FUNC
 void _tinydir_get_ext(tinydir_file *file)
 {
-	char *period = strrchr(file->name, '.');
+	_tinydir_char_t *period = _tinydir_strrchr(file->name, '.');
 	if (period == NULL)
 	{
-		file->extension = &(file->name[strlen(file->name)]);
+		file->extension = &(file->name[_tinydir_strlen(file->name)]);
 	}
 	else
 	{
@@ -556,7 +568,7 @@ int _tinydir_file_cmp(const void *a, const void *b)
 	{
 		return -(fa->is_dir - fb->is_dir);
 	}
-	return strncmp(fa->name, fb->name, _TINYDIR_FILENAME_MAX);
+	return _tinydir_strncmp(fa->name, fb->name, _TINYDIR_FILENAME_MAX);
 }
 
 #endif
