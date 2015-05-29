@@ -42,7 +42,11 @@ string USBAuth::_LocateUSB() {
    *   OS X: /media/IDENTCARD/ ?
    */
    vector<string> locations(4);
-   locations = {"F:\\\\", "F://", "/cygdrive/f/", "/media/IDENTCARD/"};
+   locations = {"F:\\\\", "F://", "/cygdrive/f/", "/media/IDENTCARD/",
+                "G:\\\\", "G://", "/cygdrive/g/",
+                "H:\\\\", "H://", "/cygdrive/h/",
+                "I:\\\\", "I://", "/cygdrive/i/",
+                "J:\\\\", "J://", "/cygdrive/j/"};
    tinydir_dir dir;
 
    for (int i = 0; i < locations.size(); i++) {
