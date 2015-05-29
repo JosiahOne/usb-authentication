@@ -46,12 +46,12 @@ string USBAuth::_LocateUSB() {
    tinydir_dir dir;
 
    for (int i = 0; i < locations.size(); i++) {
-     tinydir_open(&dir, locations[i].c_str());
+     tinydir_open(&dir, _StringToProperChar(locations[i]));
      if (dir.has_next) {
        return locations[i];
      }
    }
-
+    
    return "ERROR";
 }
 
@@ -70,11 +70,11 @@ int USBAuth::_GetPin() {
 string USBAuth::_GetFile(string name) {
   string returnData = "";
   tinydir_dir dir;
-  tinydir_open(&dir, _LocateUSB().c_str());
+  tinydir_open(&dir, _StringToProperChar(_LocateUSB().c_str()));
   while (dir.has_next) {
     tinydir_file file;
     tinydir_readfile(&dir, &file);
-    if (string(file.name) == name) {
+    if (_ProperCharToString(file.name) == name) {
       std::ifstream ifs(file.path);
       std::string stringContent = "";
       getline(ifs, stringContent);
@@ -135,3 +135,25 @@ string USBAuth::_EncryptString(string someString) {
   cout << byteForm;
   return byteForm;
 }
+
+#ifdef _UNICODE
+const wchar_t* USBAuth::_StringToProperChar(string someString) {
+    wchar_t returnData[512];
+    mbstowcs(returnData, someString.c_str(), 512);
+
+    return returnData;
+}
+string USBAuth::_ProperCharToString(wchar_t* someCString) {
+    wstring ws(someCString);
+    string test( ws.begin(), ws.end() );
+
+    return test;
+}
+#else
+const char* USBAuth::_StringToProperChar(string someString) {
+    return someString.c_str();
+}
+string USBAuth::_ProperCharToString(char* someCString) {
+    return string(someCString);
+}
+#endif

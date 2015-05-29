@@ -37,4 +37,11 @@ private:
   string _GetFile(string name);
   string _ConvertToByteForm(string someString);
   string _ConvertToStringForm(string byteFormString);
+  #ifdef _UNICODE
+  const wchar_t* _StringToProperChar(string someString);
+  string _ProperCharToString(wchar_t* someCString);
+  #else
+  const char* _StringToProperChar(string someString);
+  string _ProperCharToString(char* someCString);
+  #endif
 };
