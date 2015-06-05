@@ -46,7 +46,8 @@ string USBAuth::_LocateUSB() {
                 "G:\\\\", "G://", "/cygdrive/g/",
                 "H:\\\\", "H://", "/cygdrive/h/",
                 "I:\\\\", "I://", "/cygdrive/i/",
-                "J:\\\\", "J://", "/cygdrive/j/"};
+                "J:\\\\", "J://", "/cygdrive/j/",
+                "E:\\\\", "E://", "/cygdrive/e/" };
    tinydir_dir dir;
 
    for (int i = 0; i < locations.size(); i++) {
@@ -55,7 +56,7 @@ string USBAuth::_LocateUSB() {
        return locations[i];
      }
    }
-    
+   
    return "ERROR";
 }
 
