@@ -6,11 +6,9 @@
 #include <vector>
 #include <sstream>
 
-using namespace std;
-
 struct identReturn {
-  string username;
-  string password;
+  std::string username;
+  std::string password;
   bool failed;
 };
 
@@ -19,27 +17,27 @@ public:
   USBAuth();
   ~USBAuth();
   void ReadPin(int pin);
-  void SetKey(string key);
+  void SetKey(std::string key);
   identReturn Authenticate();
 
 private:
   int _pin;
-  string _key;
-  string _usbLocation;
-  string _LocateUSB();
+  std::string _key;
+  std::string _usbLocation;
+  std::string _LocateUSB();
   bool _ComparePINs();
-  string _GetPassword();
-  string _GetUsername();
+  std::string _GetPassword();
+  std::string _GetUsername();
   int _GetPin();
-  string _DecryptString(string someString);
-  string _EncryptString(string someString);
-  string _DoXORCipher(string someString);
-  string _GetFile(string name);
-  string _ConvertToByteForm(string someString);
-  string _ConvertToStringForm(string byteFormString);
+  std::string _DecryptString(std::string someString);
+  std::string _EncryptString(std::string someString);
+  std::string _DoXORCipher(std::string someString);
+  std::string _GetFile(std::string name);
+  std::string _ConvertToByteForm(std::string someString);
+  std::string _ConvertToStringForm(std::string byteFormString);
   #ifdef _UNICODE
-  const wchar_t* _StringToProperChar(string someString);
-  string _ProperCharToString(wchar_t* someCString);
+  const wchar_t* _StringToProperChar(std::string someString);
+  std::string _ProperCharToString(wchar_t* someCString);
   #else
   const char* _StringToProperChar(string someString);
   string _ProperCharToString(char* someCString);
