@@ -56,7 +56,7 @@ std::string USBAuth::_LocateUSB() {
        return locations[i];
      }
    }
-   
+
    return "ERROR";
 }
 
@@ -159,6 +159,6 @@ const char* USBAuth::_StringToProperChar(std::string someString) {
     return someString.c_str();
 }
 std::string USBAuth::_ProperCharToString(char* someCString) {
-    return string(someCString);
+    return std::string(someCString);
 }
 #endif

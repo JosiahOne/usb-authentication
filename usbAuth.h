@@ -39,7 +39,7 @@ private:
   const wchar_t* _StringToProperChar(std::string someString);
   std::string _ProperCharToString(wchar_t* someCString);
   #else
-  const char* _StringToProperChar(string someString);
-  string _ProperCharToString(char* someCString);
+  const char* _StringToProperChar(std::string someString);
+  std::string _ProperCharToString(char* someCString);
   #endif
 };
