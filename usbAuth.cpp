@@ -53,7 +53,14 @@ std::string USBAuth::_LocateUSB() {
    for (int i = 0; i < locations.size(); i++) {
      tinydir_open(&dir, _StringToProperChar(locations[i]));
      if (dir.has_next) {
-       return locations[i];
+         while (dir.has_next) {
+             tinydir_file file;
+             tinydir_readfile(&dir, &file);
+             if (_ProperCharToString(file.name) == "username.aid") {
+                 return locations[i];
+             }
+             tinydir_next(&dir);
+         }
      }
    }
 
