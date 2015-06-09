@@ -1,2 +1,2 @@
 language: cpp
-    script: c++ encrypter.cpp
+script: c++ encrypter.cpp
