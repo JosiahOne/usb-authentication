@@ -1,4 +1,4 @@
 language: cpp
 install: git clone https://github.com/JosiahOne/jcpp-helper
 script: c++ encrypter.cpp; c++ main.cpp usbAuth.cpp -std=c++0x;
-after_success: curl http://archives.oclint.org/releases/0.8/oclint-0.8.1-x86_64-linux-3.13.0-35-generic.tar.gz > oclint-release.tar.gz; tar -zxvf oclint-release.tar.gz; cd oclint-0*; cp bin/oclint* /usr/local/bin; cp-rp lib/* /usr/local/lib/; oclint main.cpp usbAuth.cpp -- -c -std=c++11;
+after_success: curl http://archives.oclint.org/releases/0.8/oclint-0.8.1-x86_64-linux-3.13.0-35-generic.tar.gz > oclint-release.tar.gz; tar -zxvf oclint-release.tar.gz; cd oclint-0*; sudo cp bin/oclint* /usr/local/bin; sudo cp -rp lib/* /usr/local/lib/; oclint main.cpp usbAuth.cpp -- -c -std=c++11;
