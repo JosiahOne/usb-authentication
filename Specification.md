@@ -2,7 +2,7 @@
 
 ## Abstract ##
 
-Security sucks. Specifically, user name and password combos suck even more. The process is unnecessarily long can be guessed (granted in O(n^2) time) by machines. Most people aren't willing to come up with multiple, long, complex passwords, so they are generally useless when security is an issue.
+Security sucks. Specifically, user name and password combos suck even more. The process is unnecessarily long and can be guessed (granted in O(n^2) time) by machines. Most people aren't willing to come up with multiple, long, complex passwords, so they are generally useless when security is an issue.
 
 As an example, consider a business which requires its' employees to clock in and out using a computer. Now, before they can start work, they must open up the computer, type in their user name, type in their password, and then click log in. That's best-case-scenerio. What if they forget their password? Now your IT guy has to once more reset the password.
 

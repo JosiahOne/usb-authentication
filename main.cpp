@@ -1,4 +1,4 @@
-// Examples
+// Super Minimalistic example of USBAuth. 
 #include "usbAuth.h"
 
 using namespace std;
