@@ -5,6 +5,7 @@
 #include "tinydir.h"
 #include <vector>
 #include <sstream>
+#include "jcpp-helper/jstring.h"
 
 struct identReturn {
   std::string username;

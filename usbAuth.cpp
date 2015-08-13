@@ -1,5 +1,5 @@
 #include "usbAuth.h"
-#include "jcpp-helper/jstring.h"
+
 
 USBAuth::USBAuth() {
 
@@ -41,13 +41,27 @@ std::string USBAuth::_LocateUSB() {
    *   Linux: /media/IDENTCARD/
    *   OS X: /media/IDENTCARD/ ?
    */
-   std::vector<std::string> locations(4);
-   locations = {"F:\\\\", "F://", "/cygdrive/f/", "/media/IDENTCARD/",
-                "G:\\\\", "G://", "/cygdrive/g/",
-                "H:\\\\", "H://", "/cygdrive/h/",
-                "I:\\\\", "I://", "/cygdrive/i/",
-                "J:\\\\", "J://", "/cygdrive/j/",
-                "E:\\\\", "E://", "/cygdrive/e/" };
+   std::vector<std::string> locations;
+   locations.push_back("F:\\\\");
+   locations.push_back("F://"); 
+   locations.push_back("/cygdrive/f/");
+   locations.push_back("/media/IDENTCARD/");
+   locations.push_back("G:\\\\");
+   locations.push_back("G://");
+   locations.push_back("/cygdrive/g/");
+   locations.push_back("H:\\\\");
+   locations.push_back("H://");
+   locations.push_back("/cygdrive/h/");
+   locations.push_back("I:\\\\");
+   locations.push_back("I://");
+   locations.push_back("/cygdrive/i/");
+   locations.push_back("J:\\\\");
+   locations.push_back("J://");
+   locations.push_back("/cygdrive/j/");
+   locations.push_back("E:\\\\");
+   locations.push_back("E://");
+   locations.push_back("/cygdrive/e/");
+
    tinydir_dir dir;
 
    for (int i = 0; i < locations.size(); i++) {
@@ -111,6 +125,7 @@ std::string USBAuth::_ConvertToByteForm(std::string someString) {
 }
 
 std::string USBAuth::_ConvertToStringForm(std::string byteFormString) {
+  std::string testString = byteFormString;
   std::string returnString = "";
 
   std::vector<std::string> stringArray = JCPP::GetStringsBetweenStrings(byteFormString, " ", " ");
