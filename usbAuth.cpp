@@ -64,7 +64,7 @@ std::string USBAuth::_LocateUSB() {
 
    tinydir_dir dir;
 
-   for (int i = 0; i < locations.size(); i++) {
+   for (unsigned int i = 0; i < locations.size(); i++) {
      tinydir_open(&dir, _StringToProperChar(locations[i]));
      if (dir.has_next) {
          while (dir.has_next) {
@@ -115,7 +115,7 @@ std::string USBAuth::_GetFile(std::string name) {
 
 std::string USBAuth::_ConvertToByteForm(std::string someString) {
   std::string returnString = " ";
-  for (int i = 0; i < someString.size(); i++) {
+  for (unsigned int i = 0; i < someString.size(); i++) {
     std::ostringstream oss;
     oss << returnString << static_cast<int>(static_cast<unsigned char>(someString[i])) << " ";
     returnString = oss.str();
@@ -130,7 +130,7 @@ std::string USBAuth::_ConvertToStringForm(std::string byteFormString) {
 
   std::vector<std::string> stringArray = JCPP::GetStringsBetweenStrings(byteFormString, " ", " ");
   std::vector<int> intArray;
-  for (int i = 0; i < stringArray.size(); i++) {
+  for (unsigned int i = 0; i < stringArray.size(); i++) {
     intArray.push_back(strtol(stringArray[i].c_str(), NULL, 10));
     char aChar = intArray[i];
     returnString += aChar;
@@ -145,7 +145,7 @@ std::string USBAuth::_DoXORCipher(std::string someString) {
     longKey += _key;
   }
 
-  for (int i = 0; i < someString.size(); i++) {
+  for (unsigned int i = 0; i < someString.size(); i++) {
     someString[i] ^= longKey[i];
   }
 
