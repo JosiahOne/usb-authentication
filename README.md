@@ -1,5 +1,11 @@
 # usb-authentication
-[![Build Status](https://travis-ci.org/JosiahOne/usb-authentication.svg?branch=master)](https://travis-ci.org/JosiahOne/usb-authentication)
+[![Build Status](https://travis-ci.org/JosiahOne/usb-authentication.svg?branch=master)](https://travis-ci.org/JosiahOne/usb-
+authentication)
+
+# !!! WARNING !!!
+
+This was written when I was back in high school and had no knowledge about security. This is NOT cryptographically secure in any way and shouldn't be used for critical systems.
+
 
 Library and Spec for an alternative login process that uses USB drives instead of username/password.
 
